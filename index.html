@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salgadinho&Cia — Salgados artesanais fresquinhos</title>
+  <meta name="description" content="Salgados artesanais feitos com carinho. Peça pelo WhatsApp e receba em até 30 minutos." />
+
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Ícones (Tabler webfont) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+
+  <!-- CSS do site -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ============ NAVBAR ============ -->
+  <nav class="navbar">
+    <a href="#inicio" class="logo">
+      <div class="logo-icon"><i class="ti ti-tools-kitchen-2"></i></div>
+      <div class="logo-text">
+        <h4><i class="ti ti-bread"></i> Salgadinho&Cia</h4>
+        <p>Artesanal & fresquinho</p>
+      </div>
+    </a>
+
+    <div class="nav-links">
+      <a href="#inicio" class="active" data-section="inicio"><i class="ti ti-home"></i> Início</a>
+      <a href="#cardapio" data-section="cardapio"><i class="ti ti-tools-kitchen-2"></i> Cardápio</a>
+      <a href="#combos" data-section="combos"><i class="ti ti-gift"></i> Combos</a>
+      <a href="#contato" data-section="contato"><i class="ti ti-phone"></i> Contato</a>
+    </div>
+
+    <div class="nav-actions">
+      <button class="icon-btn" id="open-cart" aria-label="Abrir carrinho">
+        <i class="ti ti-shopping-bag"></i>
+        <span class="cart-badge" id="cart-badge">0</span>
+      </button>
+      <button class="btn-primary" id="quick-whatsapp">
+        <i class="ti ti-brand-whatsapp"></i>
+        <span>Peça agora</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ============ HERO ============ -->
+  <section class="container hero" id="inicio">
+    <div>
+      <span class="hero-badge"><i class="ti ti-flame"></i> Feitos hoje, entregues hoje</span>
+      <h1>Salgados fresquinhos,<br/>feitos com <span>carinho</span>.</h1>
+      <p>Entrega rápida e sabor irresistível na sua porta. Peça pelo WhatsApp e receba quentinho em até 30 minutos.</p>
+
+      <div class="hero-ctas">
+        <button class="btn-large btn-primary-lg" onclick="scrollToSection('cardapio')">
+          <i class="ti ti-tools-kitchen-2"></i> Ver cardápio
+        </button>
+        <button class="btn-large btn-secondary-lg" onclick="openWhatsApp('Olá! Gostaria de fazer um pedido.')">
+          <i class="ti ti-brand-whatsapp" style="color:#2BB673"></i> WhatsApp
+        </button>
+      </div>
+
+      <div class="hero-stats">
+        <div>
+          <div class="stat-num">+2.500</div>
+          <div class="stat-label">Pedidos entregues</div>
+        </div>
+        <div>
+          <div class="stat-num" style="display:flex;align-items:center;gap:4px">
+            4,9 <i class="ti ti-star-filled" style="font-size:20px;color:#EF9F27"></i>
+          </div>
+          <div class="stat-label">Avaliação média</div>
+        </div>
+        <div>
+          <div class="stat-num">30min</div>
+          <div class="stat-label">Entrega média</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-image">
+        <img src="https://images.pexels.com/photos/33846217/pexels-photo-33846217.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Salgados artesanais"/>
+      </div>
+      <div class="floating-card bl">
+        <div class="float-icon green"><i class="ti ti-leaf"></i></div>
+        <div class="float-text">
+          <p>100% Artesanal</p>
+          <small>Ingredientes frescos</small>
+        </div>
+      </div>
+      <div class="floating-card tr">
+        <div class="float-icon amber"><i class="ti ti-bolt"></i></div>
+        <div class="float-text">
+          <p>Entrega rápida</p>
+          <small>Em até 30 min</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FILTROS ============ -->
+  <div class="filters-bar" id="cardapio">
+    <div class="container filters-inner">
+      <span class="filter-label">Filtrar:</span>
+      <button class="chip active" data-filter="todos">Todos</button>
+      <button class="chip" data-filter="fritos">Fritos</button>
+      <button class="chip" data-filter="assados">Assados</button>
+      <button class="chip" data-filter="vegetarianos">Vegetarianos</button>
+      <div class="search-box">
+        <i class="ti ti-search"></i>
+        <input type="text" id="search-input" placeholder="Buscar salgado..."/>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CARDÁPIO ============ -->
+  <section class="container reveal">
+    <div class="section-header">
+      <span class="eyebrow">Cardápio</span>
+      <h2>Escolha seus favoritos</h2>
+      <p>Salgados artesanais fresquinhos, preparados com ingredientes selecionados todos os dias.</p>
+    </div>
+    <div class="menu-grid" id="menu-grid"></div>
+    <div class="menu-more" id="menu-more">
+      <button class="btn-large btn-secondary-lg" id="menu-more-btn" onclick="toggleMenuView()">
+        <i class="ti ti-chevron-down"></i> Ver mais salgados
+      </button>
+    </div>
+  </section>
+
+  <!-- onda decorativa antes dos combos -->
+  <div class="wave-divider" aria-hidden="true">
+    <svg viewBox="0 0 1200 70" preserveAspectRatio="none">
+      <path d="M0,30 C300,80 600,0 1200,40 L1200,70 L0,70 Z" fill="#FFF1DF"></path>
+    </svg>
+  </div>
+
+  <!-- ============ COMBOS ============ -->
+  <section class="combos-section reveal scroll-fade" id="combos">
+    <div class="container">
+      <div class="combos-header">
+        <div>
+          <span class="eyebrow">Ofertas especiais</span>
+          <h2>Combos imperdíveis</h2>
+          <p style="color:var(--text-muted);font-size:15px">Monte sua festa ou lanche em grupo e economize.</p>
+        </div>
+        <a class="see-all" onclick="scrollToSection('cardapio')">
+          Ver todos <i class="ti ti-arrow-right"></i>
+        </a>
+      </div>
+      <div class="combos-grid" id="combos-grid"></div>
+    </div>
+  </section>
+
+  <!-- onda decorativa após os combos -->
+  <div class="wave-divider flip" aria-hidden="true">
+    <svg viewBox="0 0 1200 70" preserveAspectRatio="none">
+      <path d="M0,30 C300,80 600,0 1200,40 L1200,70 L0,70 Z" fill="#FFF1DF"></path>
+    </svg>
+  </div>
+
+  <!-- ============ CHECKOUT ============ -->
+  <section class="container reveal scroll-fade" id="checkout">
+    <div style="margin-bottom:32px">
+      <span class="eyebrow">Checkout</span>
+      <h2 style="font-size:34px;margin-top:8px">Finalize seu pedido</h2>
+    </div>
+
+    <div class="checkout-grid">
+      <div class="checkout-card">
+        <div class="step-header">
+          <span class="step-num">1</span>
+          <h3>Seus dados</h3>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Nome</label>
+            <input type="text" id="customer-name" placeholder="Seu nome"/>
+          </div>
+          <div class="field">
+            <label>WhatsApp</label>
+            <input type="tel" id="customer-phone" placeholder="(00) 00000-0000"/>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:18px">
+          <label>Endereço de entrega</label>
+          <input type="text" id="customer-address" placeholder="Rua, número, bairro"/>
+        </div>
+
+        <div class="field" style="margin-bottom:18px">
+          <label>Observações (opcional)</label>
+          <textarea id="customer-notes" rows="2" placeholder="Ex: sem cebola, troco para R$ 50..."></textarea>
+        </div>
+
+        <div class="step-divider">
+          <div class="step-header">
+            <span class="step-num">2</span>
+            <h3>Forma de pagamento</h3>
+          </div>
+          <div class="payment-grid">
+            <div class="payment-option active" data-payment="Pix">
+              <i class="ti ti-brand-pix" style="color:var(--brand)"></i>
+              <span>Pix</span>
+            </div>
+            <div class="payment-option" data-payment="Cartão">
+              <i class="ti ti-credit-card"></i>
+              <span>Cartão</span>
+            </div>
+            <div class="payment-option" data-payment="Dinheiro">
+              <i class="ti ti-cash"></i>
+              <span>Dinheiro</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cart">
+        <div class="cart-header">
+          <h3><i class="ti ti-shopping-bag"></i> Seu pedido</h3>
+          <span class="cart-count" id="cart-count">0 itens</span>
+        </div>
+        <div class="cart-items" id="cart-items"></div>
+        <div class="cart-totals">
+          <div class="total-row"><span>Subtotal</span><span id="subtotal">R$ 0,00</span></div>
+          <div class="total-row"><span>Entrega</span><span class="free">Grátis</span></div>
+          <div class="total-row final"><span>Total</span><span id="total">R$ 0,00</span></div>
+          <button class="checkout-btn" id="checkout-btn" disabled>
+            <i class="ti ti-brand-whatsapp"></i> Finalizar pelo WhatsApp
+          </button>
+          <p class="checkout-hint">Pedido confirmado em 30 segundos</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DEPOIMENTOS ============ -->
+  <section class="testimonials reveal scroll-fade">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">Depoimentos</span>
+        <h2>O que nossos clientes dizem</h2>
+        <p>Mais de 2.500 pedidos entregues com muita satisfação.</p>
+      </div>
+
+      <div class="testimonials-grid">
+        <div class="testimonial">
+          <div class="test-stars">
+            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+            <i class="ti ti-star-filled"></i>
+          </div>
+          <p class="test-quote">"As coxinhas são as melhores que já comi, chegaram quentinhas e crocantes. Super recomendo!"</p>
+          <div class="test-author">
+            <div class="avatar">FA</div>
+            <div><p>Fernanda Alencar</p><small>Cliente desde 2024</small></div>
+          </div>
+        </div>
+
+        <div class="testimonial">
+          <div class="test-stars">
+            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+            <i class="ti ti-star-filled"></i>
+          </div>
+          <p class="test-quote">"Combo esfiha e pastel valeu muito a pena. Sabor ótimo e entrega rapidíssima."</p>
+          <div class="test-author">
+            <div class="avatar">RN</div>
+            <div><p>Ricardo Nakamura</p><small>Cliente desde 2023</small></div>
+          </div>
+        </div>
+
+        <div class="testimonial">
+          <div class="test-stars">
+            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+            <i class="ti ti-star-filled"></i>
+          </div>
+          <p class="test-quote">"Festa de aniversário salva! Combo Festa Completa rendeu muito, todo mundo elogiou."</p>
+          <div class="test-author">
+            <div class="avatar">BF</div>
+            <div><p>Beatriz Fontana</p><small>Cliente desde 2025</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA FINAL ============ -->
+  <section class="container reveal scroll-fade" id="contato">
+    <div class="cta">
+      <div>
+        <span class="cta-badge"><i class="ti ti-clock"></i> Aberto agora · Seg-Sáb 9h às 20h</span>
+        <h2>Pronto para o seu salgado favorito?</h2>
+        <p>Faça seu pedido agora pelo WhatsApp e receba quentinho na sua porta. Atendimento humano e rápido.</p>
+        <div class="cta-buttons">
+          <button class="btn-white" onclick="openWhatsApp('Olá! Gostaria de fazer um pedido.')">
+            <i class="ti ti-brand-whatsapp"></i> Abrir WhatsApp
+          </button>
+          <button class="btn-ghost" onclick="scrollToSection('cardapio')">Ver cardápio</button>
+        </div>
+      </div>
+
+      <div class="contact-grid">
+        <div class="contact-card" onclick="openWhatsApp()">
+          <i class="ti ti-brand-whatsapp"></i>
+          <small>WhatsApp</small>
+          <p>(11) 98383-7001</p>
+        </div>
+        <div class="contact-card">
+          <i class="ti ti-brand-instagram"></i>
+          <small>Instagram</small>
+          <p>@salgadinhoecia</p>
+        </div>
+        <div class="contact-card">
+          <i class="ti ti-map-pin"></i>
+          <small>Endereço</small>
+          <p>Rua das Flores, 123</p>
+        </div>
+        <div class="contact-card">
+          <i class="ti ti-clock"></i>
+          <small>Horário</small>
+          <p>Seg-Sáb 9h-20h</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-logo">
+            <div class="logo-icon"><i class="ti ti-tools-kitchen-2"></i></div>
+            <h4><i class="ti ti-bread"></i> Salgadinho&Cia</h4>
+          </div>
+          <p class="footer-about">Salgados artesanais feitos com carinho e ingredientes frescos. Seu lanche perfeito, entregue rapidinho na sua porta.</p>
+        </div>
+
+        <div class="footer-col">
+          <h5>Navegação</h5>
+          <ul>
+            <li onclick="scrollToSection('inicio')"><i class="ti ti-home"></i> Início</li>
+            <li onclick="scrollToSection('cardapio')"><i class="ti ti-tools-kitchen-2"></i> Cardápio</li>
+            <li onclick="scrollToSection('combos')"><i class="ti ti-gift"></i> Combos</li>
+            <li onclick="scrollToSection('contato')"><i class="ti ti-phone"></i> Contato</li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Atendimento</h5>
+          <ul>
+            <li onclick="openWhatsApp()"><i class="ti ti-brand-whatsapp"></i> WhatsApp</li>
+            <li><i class="ti ti-brand-instagram"></i> Instagram</li>
+            <li><i class="ti ti-help"></i> FAQ</li>
+            <li><i class="ti ti-truck-delivery"></i> Entrega</li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Contato</h5>
+          <ul>
+            <li><i class="ti ti-phone"></i> (11) 98383-7001</li>
+            <li><i class="ti ti-brand-instagram"></i> @salgadinhoecia</li>
+            <li><i class="ti ti-map-pin"></i> Rua das Flores, 123</li>
+            <li><i class="ti ti-building"></i> Centro - São Paulo</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 Salgadinho&Cia. Todos os direitos reservados.</span>
+        <span>Feito com carinho em São Paulo</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ MODAL PRODUTO ============ -->
+  <div class="modal-overlay" id="product-modal">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-image" id="modal-image">
+        <img id="modal-img" src="" alt=""/>
+        <button class="modal-close" onclick="closeModal()" aria-label="Fechar">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h2 id="modal-name"></h2>
+        <div class="modal-rating">
+          <i class="ti ti-star-filled"></i>
+          <span id="modal-rating">4.9</span> · <span id="modal-category">Frito</span>
+        </div>
+        <p id="modal-desc"></p>
+        <div class="modal-price-row">
+          <div class="modal-price" id="modal-price"></div>
+          <div class="modal-qty">
+            <button onclick="changeModalQty(-1)" aria-label="Diminuir"><i class="ti ti-minus"></i></button>
+            <span id="modal-qty">1</span>
+            <button class="plus" onclick="changeModalQty(1)" aria-label="Aumentar"><i class="ti ti-plus"></i></button>
+          </div>
+        </div>
+        <button class="modal-add" onclick="addFromModal()">
+          <i class="ti ti-shopping-cart-plus"></i> Adicionar ao carrinho — <span id="modal-total"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DRAWER CARRINHO ============ -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="closeCart()"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-header">
+      <h3><i class="ti ti-shopping-bag" style="color:var(--brand)"></i> Seu pedido</h3>
+      <button class="icon-btn" onclick="closeCart()" style="border:none" aria-label="Fechar carrinho">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <div class="drawer-body" id="drawer-body"></div>
+    <div class="drawer-footer">
+      <div class="total-row final"><span>Total</span><span id="drawer-total">R$ 0,00</span></div>
+      <button class="checkout-btn" onclick="goToCheckout()">
+        <i class="ti ti-arrow-right"></i> Ir para o checkout
+      </button>
+    </div>
+  </div>
+
+  <!-- ============ TOAST ============ -->
+  <div class="toast" id="toast">
+    <i class="ti ti-check"></i>
+    <span id="toast-msg">Adicionado ao carrinho!</span>
+  </div>
+
+  <!-- ============ SCRIPTS ============ -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/interactions.js"></script>
+</body>
+</html>
