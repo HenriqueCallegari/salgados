@@ -1,6 +1,9 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:f97316,100:dc2626&height=200&section=header&text=Salgadinho%26Cia&fontSize=58&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Salgados%20artesanais%20fresquinhos&descAlignY=60&descSize=18" alt="header" />
+<img 
+  src="https://capsule-render.vercel.app/api?type=waving&color=0:f97316,100:dc2626&height=200&section=header&text=Salgadinho%26Cia&fontSize=58&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Salgados%20artesanais%20fresquinhos&descAlignY=60&descSize=18" 
+  alt="header" 
+/>
 
 <br />
 
