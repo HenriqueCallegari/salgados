@@ -22,6 +22,8 @@ let modalItem = null;
 let modalQty = 1;
 let payment = 'Pix';
 let showAllMenu = false;
+let appliedCoupon = null;          // código do cupom válido aplicado
+let kitState = {};                  // { flavorId: quantidade } do "monte seu cento"
 const INITIAL_MENU_LIMIT = 4;
 
 /* ============ RENDER CARDÁPIO ============ */
@@ -133,6 +135,200 @@ function renderCombos() {
   `).join('');
 }
 
+/* ============ RENDER FESTA / CENTO ============ */
+function renderFesta() {
+  const grid = document.getElementById('festa-grid');
+  if (!grid) return;
+  grid.innerHTML = FESTA.map((f) => {
+    const economia = Math.round((f.oldPrice - f.price));
+    const isFrozen = f.type === 'congelado';
+    return `
+      <div class="festa-card ${f.featured ? 'featured' : ''}">
+        ${f.featured ? '<span class="top-badge"><i class="ti ti-flame"></i> Mais pedido</span>' : ''}
+        <div class="festa-image">
+          <img src="${f.image}" alt="${f.name}" loading="lazy" onerror="this.src='${FALLBACK_IMG}'"/>
+          <span class="festa-qty-badge"><i class="ti ti-package"></i> ${f.qty} un</span>
+          <span class="festa-type ${isFrozen ? 'frozen' : 'hot'}">
+            <i class="ti ${isFrozen ? 'ti-snowflake' : 'ti-flame'}"></i> ${isFrozen ? 'Congelado' : 'Pronto'}
+          </span>
+        </div>
+        <div class="festa-body">
+          <h3>${f.name}</h3>
+          <p>${f.desc}</p>
+          <div class="festa-price">
+            <div>
+              <span class="festa-old">R$ ${f.oldPrice.toFixed(0)}</span>
+              <span class="festa-new">${formatBRL(f.price)}</span>
+            </div>
+            <span class="festa-economia">economize R$ ${economia}</span>
+          </div>
+          <button class="combo-btn" onclick="addCento('${f.id}', event)">
+            <i class="ti ti-shopping-cart-plus"></i> Adicionar cento
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function addCento(id, evt) {
+  const f = FESTA.find((x) => x.id === id);
+  if (!f) return;
+  const existing = cart.find((i) => i.id === id);
+  if (existing) existing.qty++;
+  else cart.push({ id: f.id, name: f.name, price: f.price, qty: 1, image: f.image });
+  if (evt) flyToCart(evt.currentTarget);
+  bumpBadge();
+  renderCart();
+  showToast(`${f.name} adicionado!`);
+}
+
+/* ============ MONTE SEU CENTO (KIT) ============ */
+function renderKitFlavors() {
+  const wrap = document.getElementById('kit-flavors');
+  if (!wrap) return;
+  wrap.innerHTML = KIT.flavors.map((fl) => {
+    const qty = kitState[fl.id] || 0;
+    return `
+      <div class="kit-flavor ${qty > 0 ? 'on' : ''}" data-id="${fl.id}">
+        <span class="kit-flavor-name">${fl.name}</span>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="updateKit('${fl.id}', -${KIT.step})" aria-label="Tirar ${KIT.step}">-${KIT.step}</button>
+          <span class="qty-num" id="kit-q-${fl.id}">${qty}</span>
+          <button class="qty-btn plus" onclick="updateKit('${fl.id}', ${KIT.step})" aria-label="Adicionar ${KIT.step}">+${KIT.step}</button>
+        </div>
+      </div>`;
+  }).join('');
+  updateKitSummary();
+}
+
+function updateKit(id, delta) {
+  const cur = kitState[id] || 0;
+  let next = cur + delta;
+  if (delta < 0) next = Math.max(0, cur + delta);   // diminui de 1 em 1 até zerar
+  kitState[id] = next;
+  if (kitState[id] <= 0) delete kitState[id];
+  const span = document.getElementById(`kit-q-${id}`);
+  if (span) span.textContent = kitState[id] || 0;
+  const row = document.querySelector(`.kit-flavor[data-id="${id}"]`);
+  if (row) row.classList.toggle('on', (kitState[id] || 0) > 0);
+  updateKitSummary();
+}
+
+function kitTotalQty() {
+  return Object.values(kitState).reduce((s, q) => s + q, 0);
+}
+
+function updateKitSummary() {
+  const totalQty = kitTotalQty();
+  const totalPrice = totalQty * KIT.unitPrice;
+  const qtyEl = document.getElementById('kit-total-qty');
+  const priceEl = document.getElementById('kit-total-price');
+  const msgEl = document.getElementById('kit-min-msg');
+  const btn = document.getElementById('kit-add-btn');
+  if (qtyEl) qtyEl.textContent = totalQty;
+  if (priceEl) priceEl.textContent = formatBRL(totalPrice);
+  const reached = totalQty >= KIT.min;
+  if (msgEl) {
+    msgEl.textContent = reached
+      ? `✓ pronto para adicionar`
+      : `faltam ${KIT.min - totalQty} para o mínimo`;
+    msgEl.classList.toggle('ok', reached);
+  }
+  if (btn) btn.disabled = !reached;
+}
+
+function addKitToCart() {
+  const totalQty = kitTotalQty();
+  if (totalQty < KIT.min) return;
+  const sabores = KIT.flavors
+    .filter((fl) => kitState[fl.id])
+    .map((fl) => `${kitState[fl.id]}x ${fl.name}`)
+    .join(', ');
+  const id = 'kit-' + Date.now();          // cada kit é um item único
+  cart.push({
+    id,
+    name: `Kit ${totalQty} salgados`,
+    price: KIT.unitPrice,
+    qty: totalQty,
+    image: FALLBACK_IMG,
+    note: sabores
+  });
+  kitState = {};
+  renderKitFlavors();
+  bumpBadge();
+  renderCart();
+  showToast(`Kit de ${totalQty} salgados adicionado!`);
+}
+
+/* ============ RENDER B2B / EMPRESAS ============ */
+function renderB2B() {
+  const benefits = document.getElementById('b2b-benefits');
+  if (benefits) {
+    benefits.innerHTML = B2B.benefits.map((b) => `
+      <div class="b2b-benefit">
+        <div class="b2b-benefit-icon"><i class="ti ${b.icon}"></i></div>
+        <h4>${b.title}</h4>
+        <p>${b.text}</p>
+      </div>`).join('');
+  }
+
+  const plans = document.getElementById('b2b-plans');
+  if (plans) {
+    plans.innerHTML = B2B.plans.map((p) => `
+      <div class="b2b-plan ${p.featured ? 'featured' : ''}">
+        ${p.featured ? '<span class="b2b-plan-tag">Mais procurado</span>' : ''}
+        <div class="b2b-plan-icon"><i class="ti ${p.icon}"></i></div>
+        <h4>${p.name}</h4>
+        <span class="b2b-plan-tagline">${p.tagline}</span>
+        <span class="b2b-plan-from">${p.from}</span>
+        <ul>${p.features.map((f) => `<li><i class="ti ti-check"></i> ${f}</li>`).join('')}</ul>
+        <button class="b2b-plan-btn" onclick="scrollToSection('b2b-form')">
+          <i class="ti ti-file-text"></i> Pedir orçamento
+        </button>
+      </div>`).join('');
+  }
+
+  const logos = document.getElementById('b2b-logos');
+  if (logos) {
+    logos.innerHTML = B2B.clients.map((c) => `<span class="b2b-logo">${c}</span>`).join('');
+  }
+}
+
+function openB2BWhatsApp() {
+  const text = encodeURIComponent('Olá! Sou de uma empresa e gostaria de um orçamento de salgados corporativos.');
+  window.open(`https://wa.me/${B2B.whatsapp}?text=${text}`, '_blank');
+}
+
+function submitB2BQuote() {
+  const required = document.querySelectorAll('.b2b-quote-card .field[data-b2b-required]');
+  let ok = true;
+  required.forEach((f) => {
+    const input = f.querySelector('input, textarea, select');
+    const valid = input && input.value.trim().length > 0;
+    f.classList.toggle('invalid', !valid);
+    if (!valid) ok = false;
+  });
+  if (!ok) {
+    showToast('Preencha nome, empresa e contato.', true);
+    return;
+  }
+
+  const val = (id) => (document.getElementById(id)?.value || '').trim();
+  let msg = `*🏢 Orçamento Corporativo - Salgadinho&Cia*\n\n`;
+  msg += `*👤 Responsável:* ${val('b2b-name')}\n`;
+  msg += `*🏢 Empresa:* ${val('b2b-company')}\n`;
+  if (val('b2b-cnpj')) msg += `*🧾 CNPJ:* ${val('b2b-cnpj')}\n`;
+  msg += `*📱 Contato:* ${val('b2b-contact')}\n`;
+  msg += `*📦 Tipo:* ${val('b2b-type')}\n`;
+  if (val('b2b-people')) msg += `*👥 Pessoas:* ${val('b2b-people')}\n`;
+  if (val('b2b-date')) msg += `*📅 Data:* ${val('b2b-date')}\n`;
+  if (val('b2b-notes')) msg += `*📝 Detalhes:* ${val('b2b-notes')}\n`;
+  msg += `\n_Aguardo a proposta. Obrigado!_`;
+
+  window.open(`https://wa.me/${B2B.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
+  showToast('Orçamento enviado ao comercial!');
+}
+
 /* ============ RENDER CARRINHO ============ */
 function renderCart() {
   const items = document.getElementById('cart-items');
@@ -146,7 +342,6 @@ function renderCart() {
   count.textContent = `${totalQty} ${totalQty === 1 ? 'item' : 'itens'}`;
   badge.textContent = totalQty;
   badge.style.display = totalQty > 0 ? 'flex' : 'none';
-  checkoutBtn.disabled = cart.length === 0;
   if (smbCount) smbCount.textContent = totalQty;
 
   const itemTemplate = (item) => `
@@ -155,6 +350,7 @@ function renderCart() {
       <div class="cart-item-info">
         <p>${item.name}</p>
         <small>${formatBRL(item.price)} cada</small>
+        ${item.note ? `<small class="cart-item-note">${item.note}</small>` : ''}
       </div>
       <div class="qty-control">
         <button class="qty-btn" onclick="updateQty('${item.id}', -1)" aria-label="Diminuir"><i class="ti ti-minus"></i></button>
@@ -171,11 +367,61 @@ function renderCart() {
 
   items.innerHTML = cart.length === 0 ? emptyTemplate : cart.map(itemTemplate).join('');
 
-  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  document.getElementById('subtotal').textContent = formatBRL(subtotal);
-  document.getElementById('total').textContent = formatBRL(subtotal);
-  document.getElementById('drawer-total').textContent = formatBRL(subtotal);
-  if (smbTotal) smbTotal.textContent = formatBRL(subtotal);
+  const t = getCartTotals();
+  document.getElementById('subtotal').textContent = formatBRL(t.subtotal);
+  document.getElementById('total').textContent = formatBRL(t.total);
+  document.getElementById('drawer-total').textContent = formatBRL(t.total);
+  if (smbTotal) smbTotal.textContent = formatBRL(t.total);
+
+  /* Desconto de cupom */
+  const discountRow = document.getElementById('discount-row');
+  if (discountRow) {
+    if (t.discount > 0) {
+      discountRow.style.display = 'flex';
+      document.getElementById('discount-value').textContent = `- ${formatBRL(t.discount)}`;
+      document.getElementById('coupon-code-label').textContent = appliedCoupon ? `(${appliedCoupon})` : '';
+    } else {
+      discountRow.style.display = 'none';
+    }
+  }
+
+  /* Taxa de entrega */
+  const deliveryEl = document.getElementById('delivery-value');
+  if (deliveryEl) {
+    if (t.subtotal === 0 || t.delivery === 0) {
+      deliveryEl.className = 'free';
+      deliveryEl.innerHTML = '<i class="ti ti-truck-delivery"></i> Grátis';
+    } else {
+      deliveryEl.className = '';
+      deliveryEl.textContent = formatBRL(t.delivery);
+    }
+  }
+
+  /* Barra de progresso de frete grátis */
+  const freeShip = document.getElementById('free-ship');
+  if (freeShip) {
+    const base = t.subtotal - t.discount;
+    const showBar = t.subtotal > 0 && !t.freeShipCoupon && base < CONFIG.freeDeliveryFrom;
+    freeShip.style.display = showBar ? 'block' : 'none';
+    if (showBar) {
+      const pct = Math.min(100, (base / CONFIG.freeDeliveryFrom) * 100);
+      document.getElementById('free-ship-fill').style.width = `${pct}%`;
+      const falta = CONFIG.freeDeliveryFrom - base;
+      document.getElementById('free-ship-msg').innerHTML =
+        `Faltam <strong>${formatBRL(falta)}</strong> para ganhar <strong>frete grátis</strong> 🚚`;
+    }
+  }
+
+  /* Pedido mínimo */
+  const minHint = document.getElementById('min-order-hint');
+  const belowMin = t.subtotal > 0 && t.subtotal < CONFIG.minOrder;
+  if (minHint) {
+    minHint.style.display = belowMin ? 'block' : 'none';
+    if (belowMin) {
+      minHint.innerHTML = `<i class="ti ti-info-circle"></i> Pedido mínimo de ${formatBRL(CONFIG.minOrder)} — faltam ${formatBRL(CONFIG.minOrder - t.subtotal)}`;
+    }
+  }
+  checkoutBtn.disabled = cart.length === 0 || belowMin;
 
   const drawerBody = document.getElementById('drawer-body');
   drawerBody.innerHTML = cart.length === 0 ? emptyTemplate : cart.map(itemTemplate).join('');
@@ -185,6 +431,60 @@ function renderCart() {
   if (smb) smb.classList.toggle('show', cart.length > 0);
 
   localStorage.setItem('salgadinho_cart', JSON.stringify(cart));
+}
+
+/* ============ TOTAIS (entrega + cupom) ============ */
+function getCartTotals() {
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  let discount = 0;
+  let freeShipCoupon = false;
+
+  if (appliedCoupon && COUPONS[appliedCoupon]) {
+    const c = COUPONS[appliedCoupon];
+    if (subtotal >= c.minOrder) {
+      if (c.type === 'percent') discount = subtotal * (c.value / 100);
+      else if (c.type === 'free_ship') freeShipCoupon = true;
+    }
+  }
+
+  const afterDiscount = subtotal - discount;
+  let delivery = 0;
+  if (subtotal > 0 && !freeShipCoupon && afterDiscount < CONFIG.freeDeliveryFrom) {
+    delivery = CONFIG.deliveryFee;
+  }
+  const total = afterDiscount + delivery;
+  return { subtotal, discount, delivery, total, freeShipCoupon };
+}
+
+/* ============ CUPOM ============ */
+function applyCoupon() {
+  const input = document.getElementById('coupon-input');
+  const msg = document.getElementById('coupon-msg');
+  const code = (input.value || '').trim().toUpperCase();
+  if (!code) return;
+
+  const coupon = COUPONS[code];
+  if (!coupon) {
+    appliedCoupon = null;
+    msg.className = 'coupon-msg error';
+    msg.textContent = 'Cupom inválido.';
+    renderCart();
+    return;
+  }
+
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  if (subtotal < coupon.minOrder) {
+    appliedCoupon = null;
+    msg.className = 'coupon-msg error';
+    msg.textContent = `Cupom válido para pedidos acima de ${formatBRL(coupon.minOrder)}.`;
+    renderCart();
+    return;
+  }
+
+  appliedCoupon = code;
+  msg.className = 'coupon-msg ok';
+  msg.innerHTML = `<i class="ti ti-circle-check"></i> ${coupon.desc} aplicado!`;
+  renderCart();
 }
 
 /* ============ FLY TO CART ============ */
@@ -453,7 +753,7 @@ document.getElementById('checkout-btn').addEventListener('click', (e) => {
     const phone = document.getElementById('customer-phone').value.trim();
     const address = document.getElementById('customer-address').value.trim();
     const notes = document.getElementById('customer-notes').value.trim();
-    const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const t = getCartTotals();
 
     let msg = `*🍴 Novo Pedido - Salgadinho&Cia*\n\n`;
     msg += `*👤 Cliente:* ${name}\n`;
@@ -463,8 +763,12 @@ document.getElementById('checkout-btn').addEventListener('click', (e) => {
     msg += `\n*🛒 Itens do pedido:*\n`;
     cart.forEach((item) => {
       msg += `• ${item.qty}x ${item.name} - ${formatBRL(item.price * item.qty)}\n`;
+      if (item.note) msg += `   ↳ ${item.note}\n`;
     });
-    msg += `\n*💰 Total:* ${formatBRL(subtotal)}\n`;
+    msg += `\n*Subtotal:* ${formatBRL(t.subtotal)}\n`;
+    if (t.discount > 0) msg += `*Desconto (${appliedCoupon}):* - ${formatBRL(t.discount)}\n`;
+    msg += `*Entrega:* ${t.delivery === 0 ? 'Grátis' : formatBRL(t.delivery)}\n`;
+    msg += `*💰 Total:* ${formatBRL(t.total)}\n`;
     msg += `*💳 Pagamento:* ${payment}\n\n`;
     msg += `_Aguardando confirmação. Obrigado!_ 🧡`;
 
@@ -510,7 +814,7 @@ function showToast(msg, isError) {
 }
 
 /* ============ NAV ATIVA ============ */
-const sections = ['inicio', 'cardapio', 'combos', 'contato'];
+const sections = ['inicio', 'cardapio', 'festa', 'combos', 'empresas', 'contato'];
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
@@ -583,5 +887,12 @@ function scrollToSection(id) {
 /* ============ INIT ============ */
 renderMenu();
 renderCombos();
+renderFesta();
+renderKitFlavors();
+renderB2B();
 renderCart();
 updateStepperByForm();
+
+/* Aplicar cupom com Enter */
+const couponInput = document.getElementById('coupon-input');
+if (couponInput) couponInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyCoupon(); } });

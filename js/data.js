@@ -151,5 +151,116 @@ const COMBOS = [
   }
 ];
 
+/* =========================================================
+   FESTA & CENTO — venda em volume (maior ticket do ramo)
+   ========================================================= */
+const FESTA = [
+  {
+    id: 'cento-tradicional',
+    name: 'Cento Tradicional',
+    qty: 100,
+    price: 89.90,
+    oldPrice: 135,
+    type: 'pronto',
+    desc: '100 salgados fritos na hora: coxinha, quibe, risole e enroladinho. Entregue quentinho.',
+    image: 'https://images.pexels.com/photos/19740635/pexels-photo-19740635.jpeg?auto=compress&cs=tinysrgb&w=900'
+  },
+  {
+    id: 'cento-premium',
+    name: 'Cento Premium',
+    qty: 100,
+    price: 119.90,
+    oldPrice: 165,
+    type: 'pronto',
+    featured: true,
+    desc: '100 salgados premium variados: coxinha, esfiha, empada, pastel, quibe e risole.',
+    image: 'https://images.pexels.com/photos/25390057/pexels-photo-25390057.jpeg?auto=compress&cs=tinysrgb&w=900'
+  },
+  {
+    id: 'cento-congelado',
+    name: 'Cento Congelado',
+    qty: 100,
+    price: 69.90,
+    oldPrice: 99,
+    type: 'congelado',
+    desc: '100 salgados crus congelados. Guarde no freezer e frite na hora da fome. Rende muito.',
+    image: 'https://images.pexels.com/photos/19964396/pexels-photo-19964396.jpeg?auto=compress&cs=tinysrgb&w=900'
+  }
+];
+
+/* "Monte seu cento" — sabores e regra de preço por volume */
+const KIT = {
+  unitPrice: 1.19,          // preço por unidade no kit (bem menor que avulso)
+  min: 50,                  // mínimo de unidades
+  step: 25,                 // botão rápido de quantidade
+  flavors: [
+    { id: 'coxinha', name: 'Coxinha' },
+    { id: 'quibe', name: 'Quibe' },
+    { id: 'esfiha', name: 'Esfiha de Carne' },
+    { id: 'esfiha-queijo', name: 'Esfiha de Queijo' },
+    { id: 'risoles', name: 'Risoles' },
+    { id: 'enroladinho', name: 'Enroladinho' },
+    { id: 'empada', name: 'Empada de Frango' },
+    { id: 'pastel', name: 'Pastel' }
+  ]
+};
+
+/* =========================================================
+   B2B — Salgados corporativos (coffee break, eventos, recorrente)
+   ========================================================= */
+const B2B = {
+  whatsapp: '5511983837002',  // WhatsApp comercial (separado do varejo) — fictício
+  benefits: [
+    { icon: 'ti-file-invoice', title: 'Emitimos Nota Fiscal', text: 'Atendemos CNPJ com NF-e e faturamento para empresas.' },
+    { icon: 'ti-calendar-repeat', title: 'Entrega recorrente', text: 'Coffee break semanal ou mensal no piloto automático.' },
+    { icon: 'ti-discount-2', title: 'Preço por volume', text: 'Quanto maior o pedido, menor o preço por unidade.' },
+    { icon: 'ti-clock-check', title: 'Pontualidade garantida', text: 'Chega no horário combinado, sempre quentinho e montado.' }
+  ],
+  plans: [
+    {
+      id: 'coffee',
+      icon: 'ti-coffee',
+      name: 'Coffee Break',
+      tagline: 'Reuniões e treinamentos',
+      from: 'a partir de R$ 12/pessoa',
+      features: ['Salgados, doces e bebidas', 'Montagem no local (opcional)', 'A partir de 15 pessoas']
+    },
+    {
+      id: 'eventos',
+      icon: 'ti-confetti',
+      name: 'Eventos & Confraternizações',
+      tagline: 'Festas da empresa',
+      from: 'orçamento sob medida',
+      featured: true,
+      features: ['Cardápio fechado por evento', 'Cento a partir de R$ 0,89/un', 'Atende de 50 a 1.000+ convidados']
+    },
+    {
+      id: 'recorrente',
+      icon: 'ti-building-store',
+      name: 'Plano Recorrente',
+      tagline: 'Escritórios e lojas',
+      from: 'contrato mensal',
+      features: ['Entrega fixa semanal/mensal', 'Faturamento mensal em NF', 'Preço travado por contrato']
+    }
+  ],
+  clients: ['TechNova', 'Grupo Solare', 'Construtora Lima', 'Banco Vértice', 'Studio 9', 'Lopes & Advogados']
+};
+
+/* =========================================================
+   CONFIG — entrega, pedido mínimo e cupons
+   ========================================================= */
+const CONFIG = {
+  minOrder: 25,            // pedido mínimo (R$)
+  deliveryFee: 8,          // taxa de entrega padrão (R$)
+  freeDeliveryFrom: 60,    // frete grátis a partir de (R$)
+  cutoffHour: 18           // horário de corte p/ entrega no mesmo dia
+};
+
+const COUPONS = {
+  'BEMVINDO10': { type: 'percent', value: 10, minOrder: 30, desc: '10% de desconto na primeira compra' },
+  'FESTA15':    { type: 'percent', value: 15, minOrder: 80, desc: '15% em pedidos de festa acima de R$ 80' },
+  'FRETEZERO':  { type: 'free_ship', value: 0, minOrder: 35, desc: 'Frete grátis acima de R$ 35' }
+};
+
 const FALLBACK_IMG = 'https://images.pexels.com/photos/33846217/pexels-photo-33846217.jpeg?auto=compress&cs=tinysrgb&w=800';
 const WHATSAPP = '5511983837001';

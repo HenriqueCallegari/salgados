@@ -174,11 +174,10 @@
       btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
     });
   }
-  attachMagnetic('.btn-primary', 0.3);
-  attachMagnetic('.btn-large', 0.2);
-  attachMagnetic('.btn-white, .btn-ghost', 0.22);
-  attachMagnetic('.icon-btn', 0.4);
-  attachMagnetic('.add-btn', 0.45);
+  /* Efeito magnético apenas nos botões pequenos/contidos.
+     Removido dos CTAs grandes para não "fugir" do clique de compra. */
+  attachMagnetic('.icon-btn', 0.25);
+  attachMagnetic('.add-btn', 0.3);
 
   /* ============ PARTÍCULAS FLUTUANTES ============ */
   if (!prefersReducedMotion) {
@@ -186,17 +185,17 @@
     particles.className = 'particles';
     document.body.appendChild(particles);
 
-    const count = window.innerWidth < 768 ? 12 : 22;
+    const count = window.innerWidth < 768 ? 6 : 12;
     for (let i = 0; i < count; i++) {
       const p = document.createElement('div');
       p.className = 'particle';
-      const size = 6 + Math.random() * 14;
+      const size = 5 + Math.random() * 11;
       p.style.width = `${size}px`;
       p.style.height = `${size}px`;
       p.style.left = `${Math.random() * 100}%`;
-      p.style.animationDuration = `${14 + Math.random() * 18}s`;
+      p.style.animationDuration = `${18 + Math.random() * 18}s`;
       p.style.animationDelay = `${Math.random() * -25}s`;
-      p.style.opacity = (0.25 + Math.random() * 0.4).toFixed(2);
+      p.style.opacity = (0.15 + Math.random() * 0.25).toFixed(2);
       particles.appendChild(p);
     }
   }

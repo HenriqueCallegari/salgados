@@ -11,8 +11,17 @@
   <!-- Open Graph -->
   <meta property="og:type" content="restaurant.menu" />
   <meta property="og:title" content="Salgadinho&Cia — Salgados artesanais quentinhos" />
-  <meta property="og:description" content="Coxinhas, quibes, esfihas e combos artesanais. Entrega em até 30 min pelo WhatsApp." />
+  <meta property="og:description" content="Coxinhas, quibes, esfihas, combos e cento para festa. Atendemos empresas com nota fiscal. Peça pelo WhatsApp." />
   <meta property="og:locale" content="pt_BR" />
+  <meta property="og:url" content="https://salgados-e3ii.onrender.com" />
+  <meta property="og:image" content="https://images.pexels.com/photos/33846217/pexels-photo-33846217.jpeg?auto=compress&cs=tinysrgb&w=1200" />
+  <meta property="og:image:alt" content="Salgados artesanais quentinhos da Salgadinho&Cia" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Salgadinho&Cia — Salgados artesanais quentinhos" />
+  <meta name="twitter:description" content="Salgados, combos e cento para festa. Atendemos empresas com nota fiscal." />
+  <meta name="twitter:image" content="https://images.pexels.com/photos/33846217/pexels-photo-33846217.jpeg?auto=compress&cs=tinysrgb&w=1200" />
 
   <!-- Preload de fontes essenciais (LCP) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,7 +74,9 @@
     <div class="nav-links">
       <a href="#inicio" class="active" data-section="inicio"><i class="ti ti-home"></i> Início</a>
       <a href="#cardapio" data-section="cardapio"><i class="ti ti-tools-kitchen-2"></i> Cardápio</a>
+      <a href="#festa" data-section="festa"><i class="ti ti-confetti"></i> Festa</a>
       <a href="#combos" data-section="combos"><i class="ti ti-gift"></i> Combos</a>
+      <a href="#empresas" data-section="empresas"><i class="ti ti-building-skyscraper"></i> Empresas</a>
       <a href="#contato" data-section="contato"><i class="ti ti-phone"></i> Contato</a>
     </div>
 
@@ -196,6 +207,52 @@
       <button class="btn-large btn-secondary-lg" id="menu-more-btn" onclick="toggleMenuView()">
         <i class="ti ti-chevron-down"></i> Ver mais salgados
       </button>
+    </div>
+  </section>
+
+  <!-- onda decorativa antes da festa -->
+  <div class="wave-divider" aria-hidden="true">
+    <svg viewBox="0 0 1200 70" preserveAspectRatio="none">
+      <path d="M0,30 C300,80 600,0 1200,40 L1200,70 L0,70 Z" fill="#FFF7EC"></path>
+    </svg>
+  </div>
+
+  <!-- ============ FESTA & CENTO ============ -->
+  <section class="festa-section reveal scroll-fade" id="festa">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">Festa &amp; Eventos</span>
+        <h2>Cento de salgados pra sua festa</h2>
+        <p>Aniversário, formatura, reunião em família? Peça por cento e economize de verdade — prontos quentinhos ou congelados pra fritar em casa.</p>
+      </div>
+
+      <div class="festa-grid" id="festa-grid"></div>
+
+      <!-- Monte seu cento -->
+      <div class="kit-builder" id="kit-builder">
+        <div class="kit-head">
+          <div>
+            <span class="eyebrow">Do seu jeito</span>
+            <h3>Monte seu cento</h3>
+            <p>Escolha os sabores e a quantidade. Mínimo de <strong>50 unidades</strong>.</p>
+          </div>
+          <div class="kit-perunit"><i class="ti ti-tag"></i> R$ 1,19 <small>/ un</small></div>
+        </div>
+        <div class="kit-flavors" id="kit-flavors"></div>
+        <div class="kit-summary">
+          <div class="kit-count">
+            <span class="kit-count-num" id="kit-total-qty">0</span> unidades
+            <small id="kit-min-msg">faltam 50 para o mínimo</small>
+          </div>
+          <div class="kit-price">
+            <span class="kit-price-label">Total estimado</span>
+            <span class="kit-price-val" id="kit-total-price">R$ 0,00</span>
+          </div>
+          <button class="kit-add-btn" id="kit-add-btn" onclick="addKitToCart()" disabled>
+            <i class="ti ti-shopping-cart-plus"></i> Adicionar ao carrinho
+          </button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -336,9 +393,30 @@
         </div>
         <div class="cart-items" id="cart-items"></div>
         <div class="cart-totals">
+          <!-- Cupom de desconto -->
+          <div class="coupon-box">
+            <i class="ti ti-ticket"></i>
+            <input type="text" id="coupon-input" placeholder="Cupom de desconto" autocomplete="off" aria-label="Cupom de desconto"/>
+            <button type="button" id="coupon-apply" onclick="applyCoupon()">Aplicar</button>
+          </div>
+          <p class="coupon-msg" id="coupon-msg"></p>
+
           <div class="total-row"><span>Subtotal</span><span id="subtotal">R$ 0,00</span></div>
-          <div class="total-row"><span>Entrega</span><span class="free"><i class="ti ti-truck-delivery"></i> Grátis</span></div>
+          <div class="total-row discount-row" id="discount-row" style="display:none">
+            <span><i class="ti ti-discount-2"></i> Desconto <em id="coupon-code-label"></em></span>
+            <span id="discount-value">- R$ 0,00</span>
+          </div>
+          <div class="total-row"><span>Entrega</span><span id="delivery-value" class="free"><i class="ti ti-truck-delivery"></i> Grátis</span></div>
+
+          <!-- Progresso de frete grátis -->
+          <div class="free-ship" id="free-ship" style="display:none">
+            <div class="free-ship-bar"><span id="free-ship-fill"></span></div>
+            <small id="free-ship-msg"></small>
+          </div>
+
           <div class="total-row final"><span>Total</span><span id="total">R$ 0,00</span></div>
+          <p class="min-order-hint" id="min-order-hint" style="display:none"></p>
+
           <button class="checkout-btn" id="checkout-btn" disabled>
             <span class="btn-content">
               <i class="ti ti-brand-whatsapp"></i> Finalizar pelo WhatsApp
@@ -401,6 +479,126 @@
         <div class="trust-badge"><i class="ti ti-shield-check"></i><span><strong>Pix seguro</strong><small>Pagamento protegido</small></span></div>
         <div class="trust-badge"><i class="ti ti-truck-delivery"></i><span><strong>Entrega própria</strong><small>Sem app intermediário</small></span></div>
         <div class="trust-badge"><i class="ti ti-leaf"></i><span><strong>100% artesanal</strong><small>Sem conservantes</small></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PARA EMPRESAS (B2B) ============ -->
+  <section class="b2b-section reveal scroll-fade" id="empresas">
+    <div class="container">
+      <div class="b2b-header">
+        <span class="eyebrow light">Para empresas</span>
+        <h2>Salgados corporativos sob medida</h2>
+        <p>Coffee break, reuniões, confraternizações e eventos. Atendemos sua empresa com nota fiscal, preço por volume e entrega pontual.</p>
+        <div class="b2b-header-cta">
+          <button class="btn-white" onclick="scrollToSection('b2b-form')"><i class="ti ti-file-text"></i> Pedir orçamento</button>
+          <button class="btn-ghost" onclick="openB2BWhatsApp()"><i class="ti ti-brand-whatsapp"></i> Falar com o comercial</button>
+        </div>
+      </div>
+
+      <div class="b2b-benefits" id="b2b-benefits"></div>
+
+      <div class="b2b-plans-wrap">
+        <h3 class="b2b-subtitle">Escolha o formato</h3>
+        <div class="b2b-plans" id="b2b-plans"></div>
+      </div>
+
+      <div class="b2b-clients">
+        <span>Empresas que já pediram com a gente</span>
+        <div class="b2b-logos" id="b2b-logos"></div>
+      </div>
+
+      <!-- Formulário de orçamento -->
+      <div class="b2b-quote" id="b2b-form">
+        <div class="b2b-quote-info">
+          <span class="eyebrow light">Orçamento em minutos</span>
+          <h3>Conte sobre o seu evento</h3>
+          <p>Preencha e envie — nosso comercial responde com a proposta direto no seu WhatsApp.</p>
+          <ul class="b2b-quote-list">
+            <li><i class="ti ti-file-invoice"></i> Nota fiscal e faturamento CNPJ</li>
+            <li><i class="ti ti-discount-2"></i> Desconto progressivo por volume</li>
+            <li><i class="ti ti-clock-check"></i> Resposta em até 2h úteis</li>
+          </ul>
+        </div>
+
+        <div class="b2b-quote-card">
+          <div class="form-row">
+            <div class="field" data-b2b-required>
+              <label>Nome do responsável</label>
+              <div class="input-wrap">
+                <i class="ti ti-user input-icon"></i>
+                <input type="text" id="b2b-name" placeholder="Seu nome"/>
+              </div>
+            </div>
+            <div class="field" data-b2b-required>
+              <label>Empresa</label>
+              <div class="input-wrap">
+                <i class="ti ti-building input-icon"></i>
+                <input type="text" id="b2b-company" placeholder="Nome da empresa"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label>CNPJ (opcional)</label>
+              <div class="input-wrap">
+                <i class="ti ti-id input-icon"></i>
+                <input type="text" id="b2b-cnpj" placeholder="00.000.000/0000-00"/>
+              </div>
+            </div>
+            <div class="field" data-b2b-required>
+              <label>WhatsApp / e-mail</label>
+              <div class="input-wrap">
+                <i class="ti ti-phone input-icon"></i>
+                <input type="text" id="b2b-contact" placeholder="(00) 00000-0000"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label>Tipo de pedido</label>
+              <div class="input-wrap">
+                <i class="ti ti-list input-icon"></i>
+                <select id="b2b-type">
+                  <option>Coffee break</option>
+                  <option>Confraternização</option>
+                  <option>Evento corporativo</option>
+                  <option>Plano recorrente</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Nº de pessoas</label>
+              <div class="input-wrap">
+                <i class="ti ti-users input-icon"></i>
+                <input type="number" id="b2b-people" min="1" placeholder="Ex: 30"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="field" style="margin-bottom:16px">
+            <label>Data do evento (opcional)</label>
+            <div class="input-wrap">
+              <i class="ti ti-calendar input-icon"></i>
+              <input type="date" id="b2b-date"/>
+            </div>
+          </div>
+
+          <div class="field" style="margin-bottom:18px">
+            <label>Detalhes (opcional)</label>
+            <div class="input-wrap">
+              <i class="ti ti-message-circle input-icon"></i>
+              <textarea id="b2b-notes" rows="2" placeholder="Conte o que você precisa: cardápio, restrições, local..."></textarea>
+            </div>
+          </div>
+
+          <button class="b2b-submit" onclick="submitB2BQuote()">
+            <i class="ti ti-brand-whatsapp"></i> Enviar orçamento pelo WhatsApp
+          </button>
+          <p class="checkout-hint"><i class="ti ti-shield-check"></i> Sem compromisso · resposta rápida do comercial</p>
+        </div>
       </div>
     </div>
   </section>
@@ -468,7 +666,9 @@
           <ul>
             <li onclick="scrollToSection('inicio')"><i class="ti ti-home"></i> Início</li>
             <li onclick="scrollToSection('cardapio')"><i class="ti ti-tools-kitchen-2"></i> Cardápio</li>
+            <li onclick="scrollToSection('festa')"><i class="ti ti-confetti"></i> Festa &amp; Cento</li>
             <li onclick="scrollToSection('combos')"><i class="ti ti-gift"></i> Combos</li>
+            <li onclick="scrollToSection('empresas')"><i class="ti ti-building-skyscraper"></i> Para empresas</li>
             <li onclick="scrollToSection('contato')"><i class="ti ti-phone"></i> Contato</li>
           </ul>
         </div>
